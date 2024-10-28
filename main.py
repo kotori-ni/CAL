@@ -6,7 +6,7 @@ from dataload import create_dataset
 from inference import Inference
 
 def create_logger(log_path):
-
+    # 清除已有的日志处理器
     logging.getLogger().handlers = []
 
     logger = logging.getLogger(__name__)
@@ -24,18 +24,21 @@ def create_logger(log_path):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, default='google/flan-t5-large', choices=MODEL_SET)
+    parser.add_argument('--model', type=str, default='llama2-13b-chat', choices=MODEL_SET)
     parser.add_argument('--dataset', type=str, default='mnli', choices=["mnli","HANS","bbq",'unqover','mt_bench','chatbot'])
-    parser.add_argument('--model_dir', type=str, default="../../model")
+    parser.add_argument('--model_dir', type=str, default="./models")
+    # 是否使用 few-shot 学习，默认为不使用
     parser.add_argument('--shot', type=int, default=0)
     parser.add_argument('--generate_len', type=int, default=4)
     parser.add_argument('--debias', action='store_true')
+    # few-shot 学习的样本数
     parser.add_argument('--fs_num', type=int, default=-1)
     parser.add_argument('--seed', type=int, default=1)
     args = parser.parse_args()
     return args
 
 def inference(args, inference_model, RESULTS_DIR):
+    # 零样本推理
     if args.shot==0:
         if args.debias:
             for prompt in prompt_raw[args.dataset][1:2]:
@@ -49,7 +52,8 @@ def inference(args, inference_model, RESULTS_DIR):
                 acc = inference_model.predict(prompt)
                 args.logger.info(f"Prompt: {prompt}, acc: {acc}%\n")
                 with open(RESULTS_DIR+args.save_file_name+".txt", "a+") as f:
-                    f.write("Prompt: {}, acc: {:.2f}%\n".format                                                                                                                                           (prompt, acc*100))
+                    f.write("Prompt: {}, acc: {:.2f}%\n".format)      
+    # few-shot 推理                                                                                                                                     (prompt, acc*100))
     else:
         if args.fs_num!=-1:
             for prompt in prompt_raw[args.dataset][:1]:

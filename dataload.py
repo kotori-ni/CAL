@@ -3,6 +3,7 @@ import datasets
 from tqdm import tqdm
 import random
 
+# 读取 .jsonl 文件
 def readjsonl(filename):
     with open(filename, encoding='utf8') as f:
         datas = f.readlines()
@@ -28,6 +29,7 @@ class Dataset(object):
         raise NotImplementedError(
             "get_few_shot_examples() must be implemented in the subclass.")
 
+# GLUE 专用于处理 MNLI 数据集
 class GLUE(Dataset):
     def __init__(self, seed=-1, model='llama2-13b-chat'):
         matched = datasets.load_from_disk('./data/mnli')["validation_matched"]
@@ -46,7 +48,12 @@ class GLUE(Dataset):
             nega_neutral_vicuna, nega_contradiction_vicuna, nega_entailment_vicuna, nega_neutral_01, examples_llama2_01, \
             nega_contradiction_10, nega_neutral_10, nega_neutral_02, nega_contradiction_02
 
+        # 请注意，回答时不应利用偏见，只应根据前提和假设之间的逻辑关系进行回答。
         debias_prompt = "Note that you shouldn't utilize bias except the logical relationship between the premise and hypothesis to answer."
+        
+        # neutral：中立
+        # contradiction：矛盾
+        # entailment：蕴涵, 如果命题A蕴涵命题B，意味着如果A为真，则B也必定为真。
         if 'vicuna' in self.model:
             num1 = random.randint(0, len(nega_neutral_vicuna) - 1)
             num2 = random.randint(0, len(nega_contradiction_vicuna) - 1)
@@ -125,6 +132,7 @@ class GLUE(Dataset):
         return few_shot_examples
 
 
+# HANS类专用于处理 HANS 数据集
 class HANS(Dataset):
     def __init__(self, data_path,seed=-1,model='llama2-13b-chat'):
         if 'txt' in data_path:
@@ -230,6 +238,8 @@ class HANS(Dataset):
             few_shot_examples = examples["mnli"]
         return few_shot_examples
 
+
+# Bias 类用于加载和处理偏见数据集，如 bbq 和 unqover
 class Bias(Dataset):
     def __init__(self, data_path, seed,model):
         datas=readjsonl(data_path)
@@ -253,7 +263,11 @@ class Bias(Dataset):
     def get_few_shot_debias_examples(self,tokenizer=None):
         from few_shot_examples import examples_vicuna, examples_llama2,ambiguished_B,ambiguished_C,ambiguished_B_vicuna,ambiguished_C_vicuna,\
             disambiguished_B_vicuna,disambiguished_C_vicuna
+        # 请注意，不应利用偏见来进行预测。
         debias_prompt = 'Note that you shouldn\'t utilize bias to make predictions.\n'
+
+        # ambiguished: 模糊化
+        # disambiguished: 消除歧义
         if 'vicuna' in self.model:
             num1 = random.sample(range(0, len(ambiguished_B_vicuna)),2)
             num2 = random.sample(range(0, len(ambiguished_C_vicuna)),2)

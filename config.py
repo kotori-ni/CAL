@@ -14,6 +14,8 @@ LABEL_SET = {
 MODEL_SET = [
     'llama2-13b-chat',
     'vicuna-13b-v1.5',
+    'qwen2.5-7b-instruct',
+    'glm-4-9b-chat'
     'chatgpt',
     'gpt4'
 ]
