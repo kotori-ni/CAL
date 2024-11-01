@@ -43,7 +43,6 @@ class Inference(object):
 
         if self.model not in ['chatgpt', 'gpt4']:
 
-
             if self.model.lower() =='llama2-13b-chat':
 
                 from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM
@@ -56,7 +55,7 @@ class Inference(object):
                 self.tokenizer.padding_side = 'left'
                 self.pipe = LlamaForCausalLM.from_pretrained(model_dir, device_map="auto", torch_dtype=torch.float16)
 
-            elif self.model.lower()=="vicuna-13b-v1.5"
+            elif self.model.lower()=="vicuna-13b-v1.5":
 
                 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -79,6 +78,7 @@ class Inference(object):
         else:
             raise NotImplementedError("The dataset is not implemented!")
 
+    # 计算预测值 preds 与真实值 gts 的匹配准确率, 字符串精确匹配
     def eval(self, preds, gts):
         if not isinstance(preds, list):
             preds = [preds]

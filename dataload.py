@@ -295,6 +295,7 @@ class Bias(Dataset):
                 few_shot_examples = examples_vicuna["bbq"].format(self.a.format(debias_prompt), self.f.format(debias_prompt), self.b.format(debias_prompt),
                                 debias_prompt, self.c.format(debias_prompt), debias_prompt, self.d.format(debias_prompt), self.e.format(debias_prompt))
             self.selected.append((num1[0],num1[1],num2[0],num2[1],num3,num4))
+            
         else:
             num1 = random.sample(range(0, len(ambiguished_B)), 2)
             num2 = random.sample(range(0, len(ambiguished_C)), 2)
